@@ -1,7 +1,9 @@
 import type { Showtime } from '../../../types'
 import type { QuickFilter } from '../../../lib/showtime-utils'
 
-export const API_URL = 'http://localhost:3001'
+export const API_URL = import.meta.env.DEV
+    ? 'http://localhost:3001'
+    : (import.meta.env.VITE_API_URL || 'http://localhost:3001')
 export const BROWSER_CACHE_KEY = 'cinema-compare-showtimes'
 export const BROWSER_CACHE_DURATION_MS = 24 * 60 * 60 * 1000
 export const SHOWTIMES_PER_PAGE = 15
