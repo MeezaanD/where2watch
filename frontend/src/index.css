@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 3% 6%;
+    --foreground: 40 29% 92%;
+    --card: 60 4% 10%;
+    --card-foreground: 40 29% 92%;
+    --primary: 27 78% 60%;
+    --primary-foreground: 30 53% 7%;
+    --secondary: 60 3% 13%;
+    --secondary-foreground: 40 29% 92%;
+    --muted: 60 3% 13%;
+    --muted-foreground: 44 5% 60%;
+    --accent: 27 78% 60%;
+    --accent-foreground: 30 53% 7%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 40 29% 92%;
+    --border: 0 0% 100% / 0.08;
+    --input: 0 0% 100% / 0.08;
+    --ring: 27 78% 60%;
+    --radius: 0.625rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased text-[14px] font-normal;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-medium;
+  }
+}
+
+@layer components {
+  .badge-sk {
+    background: rgba(42, 110, 187, 0.12);
+    color: #2a6ebb;
+    border: 0.5px solid #2a6ebb;
+    border-radius: 5px;
+  }
+
+  .badge-nm {
+    background: rgba(200, 75, 49, 0.12);
+    color: #c84b31;
+    border: 0.5px solid #c84b31;
+    border-radius: 5px;
+  }
+
+  .btn-amber {
+    background: #e8924a;
+    color: #1a1008;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+  }
+}
