@@ -25,10 +25,18 @@ export async function getShowtimes(filters?: {
 
   console.log('Fetching fresh data from scrapers...');
 
-  // Run both scrapers in parallel
+  // Run both scrapers in parallel with timeout protection
+  const timeout = (promise: Promise<Showtime[]>, timeoutMs: number) =>
+    Promise.race([
+      promise,
+      new Promise<Showtime[]>((_, reject) =>
+        setTimeout(() => reject(new Error(`Scraper timeout after ${timeoutMs}ms`)), timeoutMs)
+      )
+    ]);
+
   const [sterKinekorResults, nuMetroResults] = await Promise.allSettled([
-    scrapeSterKinekor(),
-    scrapeNuMetro()
+    timeout(scrapeSterKinekor(), 60000),
+    timeout(scrapeNuMetro(), 60000)
   ]);
 
   const allShowtimes: Showtime[] = [];
