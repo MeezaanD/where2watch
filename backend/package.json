@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "postinstall": "npx playwright install chromium",
+    "postinstall": "PLAYWRIGHT_BROWSERS_PATH=./.playwright npx playwright install chromium",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "PLAYWRIGHT_BROWSERS_PATH=./.playwright node dist/index.js"
   },
   "dependencies": {
     "cheerio": "^1.2.0",
