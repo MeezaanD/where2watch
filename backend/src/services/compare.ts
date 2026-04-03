@@ -16,11 +16,12 @@ export async function getShowtimes(filters?: {
   branch?: string;
 }): Promise<Showtime[]> {
   const cacheKey = 'all-showtimes';
+  const cachedEntry = cache[cacheKey];
 
   // Check cache
-  if (cache[cacheKey] && Date.now() - cache[cacheKey].timestamp < CACHE_DURATION) {
+  if (cachedEntry && Date.now() - cachedEntry.timestamp < CACHE_DURATION) {
     console.log('Using cached data');
-    return filterShowtimes(cache[cacheKey].data, filters);
+    return filterShowtimes(cachedEntry.data, filters);
   }
 
   console.log('Fetching fresh data from scrapers...');
@@ -35,8 +36,8 @@ export async function getShowtimes(filters?: {
     ]);
 
   const [sterKinekorResults, nuMetroResults] = await Promise.allSettled([
-    timeout(scrapeSterKinekor(), 60000),
-    timeout(scrapeNuMetro(), 60000)
+    timeout(scrapeSterKinekor(), 90000),
+    timeout(scrapeNuMetro(), 90000)
   ]);
 
   const allShowtimes: Showtime[] = [];
@@ -57,11 +58,15 @@ export async function getShowtimes(filters?: {
   const dedupedShowtimes = deduplicateShowtimes(allShowtimes);
   const sortedShowtimes = sortShowtimes(dedupedShowtimes);
 
-  // Update cache
-  cache[cacheKey] = {
-    data: sortedShowtimes,
-    timestamp: Date.now()
-  };
+  if (sortedShowtimes.length > 0) {
+    cache[cacheKey] = {
+      data: sortedShowtimes,
+      timestamp: Date.now()
+    };
+  } else if (cachedEntry) {
+    console.log('Scrapers returned no data; serving previous cached data');
+    return filterShowtimes(cachedEntry.data, filters);
+  }
 
   return filterShowtimes(sortedShowtimes, filters);
 }

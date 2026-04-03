@@ -2,6 +2,7 @@ import { chromium, type Page } from 'playwright';
 import type { Showtime } from '../types.js';
 
 const ALLOWED_NUMETRO_BRANCHES = ['Canal Walk', 'Cavendish Square'];
+const MAX_NUMETRO_MOVIES = 8;
 
 export async function scrapeNuMetro(): Promise<Showtime[]> {
   const browser = await chromium.launch({ headless: true });
@@ -10,12 +11,12 @@ export async function scrapeNuMetro(): Promise<Showtime[]> {
   try {
     await page.goto('https://numetro.co.za/now-showing/', {
       waitUntil: 'domcontentloaded',
-      timeout: 45000
+      timeout: 25000
     });
 
-    await page.waitForTimeout(3500);
+    await page.waitForTimeout(1200);
 
-    await page.waitForSelector('a[href*="/movie/"]', { timeout: 15000 });
+    await page.waitForSelector('a[href*="/movie/"]', { timeout: 8000 });
 
     const showtimes: Showtime[] = [];
 
@@ -35,16 +36,16 @@ export async function scrapeNuMetro(): Promise<Showtime[]> {
       })
     );
 
-    for (const movieAnchor of movieAnchors) {
+    for (const movieAnchor of movieAnchors.slice(0, MAX_NUMETRO_MOVIES)) {
       try {
-        await page.goto(movieAnchor.href, { waitUntil: 'domcontentloaded', timeout: 45000 });
-        await page.waitForTimeout(3500);
+        await page.goto(movieAnchor.href, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.waitForTimeout(900);
 
         for (const branchName of ALLOWED_NUMETRO_BRANCHES) {
           const selectedCinema = await selectNuMetroCinema(page, branchName);
           if (!selectedCinema) continue;
 
-          await page.waitForTimeout(1500);
+          await page.waitForTimeout(500);
 
           const bodyText = await page.locator('body').innerText();
           const times = extractAllTimes(bodyText);

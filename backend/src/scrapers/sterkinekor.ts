@@ -7,28 +7,29 @@ const ALLOWED_STER_LOCATIONS = [
   { branch: 'V&A Waterfront', location: 'va' },
   { branch: 'Blue Route', location: 'blue-route' }
 ];
+const MAX_STER_MOVIES = 8;
 
 export async function scrapeSterKinekor(): Promise<Showtime[]> {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
   try {
-    const movieUrls = await fetchSterMovieUrls();
+    const movieUrls = (await fetchSterMovieUrls()).slice(0, MAX_STER_MOVIES);
     const showtimes: Showtime[] = [];
 
     for (const { branch, location } of ALLOWED_STER_LOCATIONS) {
       for (const movieUrl of movieUrls) {
         try {
           await page.goto(`${movieUrl}?location=${location}`, {
-            waitUntil: 'networkidle',
-            timeout: 45000
+            waitUntil: 'domcontentloaded',
+            timeout: 20000
           });
 
           const title = (await page.locator('h1').first().textContent()) ?? '';
           const movieName = normalizeWhitespace(title);
           if (!movieName) continue;
 
-          await page.waitForTimeout(1200);
+          await page.waitForTimeout(400);
           const posterUrl = await extractSterPosterUrl(page);
           const cards = await page.locator('.showtime_card').all();
           const formatHints = (await page.locator('.gr-showtimes__bordered-text div').allTextContents())
